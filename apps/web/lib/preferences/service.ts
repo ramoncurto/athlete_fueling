@@ -33,8 +33,12 @@ export const summarizePreference = (preference: Preference) => {
     locale: preference.locale,
     diet: preference.dietaryFlags,
     brandBias: preference.favoriteBrands,
+    bannedBrands: preference.bannedBrands,
     caffeine: preference.caffeineSensitivity,
     flavorNotes,
+    fuelStyle: preference.prefersEnergyDrink ? "energy_drink" : "water_solids",
+    gels: preference.usesGels,
+    homemadeCount: preference.homemadeSupplements.length,
     carry: preference.carryProfile,
   };
 };

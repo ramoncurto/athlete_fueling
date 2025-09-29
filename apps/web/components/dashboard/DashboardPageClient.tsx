@@ -61,6 +61,7 @@ function DashboardContent({
             nextEvent={trackedEvents[0]?.event || availableEvents[0]}
             allAthletes={allAthletes}
             locale={params.locale}
+            preference={preference}
           />
         );
       case 'events':
@@ -94,6 +95,7 @@ function DashboardContent({
             nextEvent={trackedEvents[0]?.event || availableEvents[0]}
             allAthletes={allAthletes}
             locale={params.locale}
+            preference={preference}
           />
         );
     }

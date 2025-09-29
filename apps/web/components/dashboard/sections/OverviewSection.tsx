@@ -1,6 +1,7 @@
 import DashboardHero from '../DashboardHero';
 import QuickActions from '../QuickActions';
-import type { Athlete, Event } from '@schemas/index';
+import PreferenceSummaryCard from '../PreferenceSummaryCard';
+import type { Athlete, Event, Preference } from '@schemas/index';
 
 type OverviewSectionProps = {
   athlete: Athlete;
@@ -9,6 +10,7 @@ type OverviewSectionProps = {
   nextEvent?: Event;
   allAthletes: Athlete[];
   locale: string;
+  preference: Preference;
 };
 
 export default function OverviewSection({
@@ -17,7 +19,8 @@ export default function OverviewSection({
   trackedEventsCount,
   nextEvent,
   allAthletes,
-  locale
+  locale,
+  preference,
 }: OverviewSectionProps) {
   return (
     <div className="space-y-8">
@@ -30,11 +33,14 @@ export default function OverviewSection({
         locale={locale}
       />
 
-      <QuickActions
-        subscribed={subscribed}
-        hasEvents={trackedEventsCount > 0}
-        locale={locale}
-      />
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+        <QuickActions
+          subscribed={subscribed}
+          hasEvents={trackedEventsCount > 0}
+          locale={locale}
+        />
+        <PreferenceSummaryCard preference={preference} />
+      </div>
     </div>
   );
 }
