@@ -40,7 +40,6 @@ export default function SignUpPage() {
       }
       setSuccess(true);
 
-      // Low-friction: auto sign-in using the demo access code pattern (last name)
       const result = await signIn("credentials", {
         redirect: false,
         email,
@@ -49,7 +48,6 @@ export default function SignUpPage() {
       if (!result?.error) {
         window.location.href = "../dashboard";
       } else {
-        // Fallback: take them to sign-in with prefilled email
         window.location.href = `../auth/sign-in?email=${encodeURIComponent(email)}`;
       }
     } catch (e) {
@@ -61,7 +59,7 @@ export default function SignUpPage() {
     <div className="mx-auto max-w-md space-y-6 rounded-3xl border border-slate-800/70 bg-slate-900/40 p-8 text-sm text-slate-200">
       <div className="space-y-2">
         <h1 className="text-2xl font-semibold text-white">Create your athlete dashboard</h1>
-        <p className="text-xs text-slate-400">Quick setup. No passwords—use your last name as the access code.</p>
+        <p className="text-xs text-slate-400">Quick setup. No passwords - use your last name as the access code.</p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -123,9 +121,7 @@ export default function SignUpPage() {
           </div>
         </div>
         {error && <p className="text-xs text-red-300">{error}</p>}
-        {success && (
-          <p className="text-xs text-cyan-300">Profile created. Finishing sign-in…</p>
-        )}
+        {success && <p className="text-xs text-cyan-300">Profile created. Finishing sign-in...</p>}
         <button
           type="submit"
           disabled={!email || !firstName || !lastName || !weightValid || !timezone}

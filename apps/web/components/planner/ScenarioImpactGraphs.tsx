@@ -64,7 +64,7 @@ export default function ScenarioImpactGraphs({ scenario, weightKg }: Props) {
 
       <div className="space-y-2">
         <div className="flex items-center justify-between text-[11px] text-slate-400">
-          <span className="uppercase tracking-wide">Sodium coverage (× target)</span>
+          <span className="uppercase tracking-wide">Sodium coverage (x target)</span>
           <span className="tabular-nums text-slate-300">target {timeline.sodiumTargetPerHour} mg/h</span>
         </div>
         {/* Map ratio 0..2 to chart; threshold 1.0 */}

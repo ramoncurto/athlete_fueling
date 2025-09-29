@@ -28,7 +28,7 @@ export default function GetStartedPage() {
 
         <div className="rounded-3xl border border-slate-800/70 bg-slate-900/40 p-6 text-sm text-slate-200">
           <h2 className="text-lg font-semibold text-white">2. Unlock full access</h2>
-          <p className="mt-2 text-xs text-slate-400">Athlete Annual — $20/year. Cancel anytime.</p>
+          <p className="mt-2 text-xs text-slate-400">Athlete Annual - $20/year. Cancel anytime.</p>
           <div className="mt-4 flex items-center gap-3">
             <Link
               href="../checkout/annual"
