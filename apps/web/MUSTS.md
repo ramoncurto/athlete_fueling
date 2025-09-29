@@ -1,0 +1,9 @@
+- new athlete can sign in
+- athlete can log in into dashboard
+- unique 20 dolars year price suscription
+- easy workflow webpage to low friction ux
+- athlete have a dashboard where can set his preferences: brand supplementation, products supplementation, homemade options, if he prefers drink energy supplementation or not, if he wants to use gels,...
+- athlete have dashboard with a list of his events where can access to supplementation for this events
+- athlete have a dashboard part for gut training instructions
+- athlete have a supplementation plan for his races or events
+ - for each event the athlete will set some options as on fuel calculator plus his preferences and will get a event supplementation plan

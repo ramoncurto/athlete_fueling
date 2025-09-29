@@ -1,0 +1,17 @@
+{
+  "name": "athletic-fuel",
+  "private": true,
+  "packageManager": "npm@10.8.1",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace web",
+    "build": "npm run build --workspace web",
+    "start": "npm run start --workspace web",
+    "lint": "npm run lint --workspace web",
+    "test": "npm run test --workspaces --if-present",
+    "format": "npm run format --workspace web"
+  }
+}

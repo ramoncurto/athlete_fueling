@@ -1,0 +1,42 @@
+{
+  "extends": "../../packages/config/tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "jsx": "preserve",
+    "allowJs": true,
+    "types": [
+      "node",
+      "next",
+      "next/types/global"
+    ],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "incremental": true,
+    "isolatedModules": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@schemas/*": ["./lib/schemas/*"],
+      "@lib/*": ["./lib/*"],
+      "@data/*": ["./lib/data/*"],
+      "@components/*": ["./components/*"],
+      "@app/*": ["./app/*"]
+    }
+  },
+  "include": [
+    "**/*.cjs",
+    "**/*.cts",
+    "**/*.mjs",
+    "**/*.mts",
+    "**/*.ts",
+    "**/*.tsx",
+    "next-env.d.ts",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
