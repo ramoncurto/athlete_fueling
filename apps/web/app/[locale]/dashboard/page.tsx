@@ -1,9 +1,4 @@
-import PreferencesForm from "@/components/dashboard/PreferencesForm";
-import HistoryTimeline from "@/components/dashboard/HistoryTimeline";
-import KitSummary from "@/components/dashboard/KitSummary";
-import EventAccessList from "@/components/dashboard/EventAccessList";
-import GutTrainingGuide from "@/components/dashboard/GutTrainingGuide";
-import ScenarioStudio from "@/components/planner/ScenarioStudio";
+import DashboardPageClient, { type DashboardData } from '@/components/dashboard/DashboardPageClient';
 import { generateGutTrainingMiniPlan } from "@/lib/training/gut";
 import { buildAthleteHistory } from "@/lib/history/service";
 import {
@@ -29,7 +24,7 @@ const toTime = (iso: string) => {
   return Number.isNaN(time) ? 0 : time;
 };
 
-export default async function DashboardPage({ params }: PageProps) {
+async function getDashboardData(params: PageProps['params']) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     const callback = encodeURIComponent(`/${params.locale}/dashboard`);
@@ -48,11 +43,8 @@ export default async function DashboardPage({ params }: PageProps) {
     listEvents(),
   ]);
 
-  if (!preference) {
-    return <p className="text-sm text-slate-300">No preference profile found.</p>;
-  }
-  if (!athlete) {
-    return <p className="text-sm text-slate-300">No athlete profile found.</p>;
+  if (!preference || !athlete) {
+    return null;
   }
 
   const eventsById = new Map(events.map((event) => [event.id, event]));
@@ -112,70 +104,32 @@ export default async function DashboardPage({ params }: PageProps) {
     scenario: primaryTracked?.scenario,
   });
 
-  return (
-    <div className="space-y-6">
-      {!subscribed && (
-        <div className="rounded-2xl border border-slate-800/70 bg-slate-900/40 p-4 text-xs text-slate-300">
-          <span className="font-semibold text-slate-200">Demo mode</span>
-          <span className="mx-2 text-slate-500">-</span>
-          <span>Subscribe to Athlete Annual for $20/year to unlock full Scenario Studio.</span>
-          <a
-            href="../checkout/annual"
-            className="ml-3 inline-flex rounded-full bg-gradient-to-r from-cyan-500 to-sky-600 px-3 py-1 font-semibold text-white"
-          >
-            Subscribe
-          </a>
+  return {
+    athlete,
+    allAthletes,
+    preference,
+    history,
+    subscribed,
+    trackedEvents,
+    availableEvents,
+    gutPlan,
+    params
+  };
+}
+
+
+export default async function DashboardPage({ params }: PageProps) {
+  const data = await getDashboardData(params);
+
+  if (!data) {
+    return (
+      <div className="min-h-screen bg-slate-950 p-6">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-sm text-slate-300">No athlete or preference profile found.</p>
         </div>
-      )}
-      <div>
-        <h1 className="text-3xl font-semibold text-white">Athlete Dashboard</h1>
-        <p className="text-sm text-slate-300">
-          Preferences feed directly into Scenario Studio and Kit Builder. History keeps every plan, kit, and intake log
-          ready for compliance reviews.
-        </p>
-        <form method="get" className="mt-4 flex items-center gap-3 text-sm">
-          <label htmlFor="athleteId" className="text-slate-400">
-            Viewing history for
-          </label>
-          <select
-            id="athleteId"
-            name="athleteId"
-            defaultValue={athlete.id}
-            className="rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-white focus:border-cyan-500 focus:outline-none"
-          >
-            {allAthletes.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.firstName} {a.lastName}
-              </option>
-            ))}
-          </select>
-          <button
-            type="submit"
-            className="rounded-full border border-slate-700 px-3 py-2 text-xs font-semibold text-slate-200 hover:border-cyan-500"
-          >
-            Switch
-          </button>
-        </form>
       </div>
-      <div className="grid gap-6 lg:grid-cols-[1fr_0.85fr]">
-        <PreferencesForm preference={preference} />
-        <KitSummary kits={history.kits} />
-      </div>
-      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <EventAccessList locale={params.locale} tracked={trackedEvents} available={availableEvents} />
-        <GutTrainingGuide plan={gutPlan} />
-      </div>
-      <div className="space-y-3" id="scenario-studio">
-        <h2 className="text-2xl font-semibold text-white">Scenario Studio</h2>
-        <p className="text-sm text-slate-300">Simulate different fueling options and see how they play out for your race.</p>
-        <ScenarioStudio
-          athlete={{ id: athlete.id, firstName: athlete.firstName, lastName: athlete.lastName }}
-          athleteWeightKg={Number(athlete.weightKg) || undefined}
-          lockAthlete
-          demo={!subscribed}
-        />
-      </div>
-      <HistoryTimeline plans={history.plans} intake={history.intakeEvents} />
-    </div>
-  );
+    );
+  }
+
+  return <DashboardPageClient data={data as DashboardData} />;
 }
