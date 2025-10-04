@@ -165,6 +165,25 @@ export const getRouteById = async (routeId: string): Promise<Route | undefined> 
   return row ? parseSingle(RouteSchema)(row) : undefined;
 };
 
+export const updateRoute = async (
+  routeId: string,
+  patch: Partial<Route>,
+): Promise<Route> => {
+  const updated = await sheets.update(
+    "routes",
+    (route) => route.id === routeId,
+    (route) => ({
+      ...route,
+      ...patch,
+    }),
+  );
+
+  if (!updated) {
+    throw new Error(`Route ${routeId} not found`);
+  }
+  return parseSingle(RouteSchema)(updated);
+};
+
 export const listProducts = async (): Promise<Product[]> => {
   const rows = await sheets.list("products");
   return parseMany(ProductSchema)(rows);

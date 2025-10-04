@@ -23,7 +23,7 @@ const renderChipRow = (values: string[]) => (
     {values.map((value) => (
       <span
         key={value}
-        className="rounded-full border border-slate-700 bg-slate-800/50 px-3 py-1 text-[11px] uppercase tracking-wide text-slate-200"
+        className="rounded-full border border-cyan-200 bg-cyan-50 px-3 py-1.5 text-[11px] font-medium uppercase tracking-wide text-cyan-700"
       >
         {value}
       </span>
@@ -52,63 +52,47 @@ export default function PreferenceSummaryCard({ preference }: PreferenceSummaryC
 
   return (
     <section
-      className="rounded-3xl border border-slate-800/50 bg-slate-900/30 p-6 text-slate-200 shadow-[0_25px_70px_-35px_rgba(8,47,73,0.65)]"
+      className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm"
       id="preference-summary"
       aria-labelledby="preference-summary-title"
     >
-      <div className="mb-6 space-y-1">
-        <p className="text-xs uppercase tracking-wide text-cyan-300/80">Fueling Snapshot</p>
-        <h2 id="preference-summary-title" className="text-xl font-semibold text-white">
-          Preferences at a glance
-        </h2>
-        <p className="text-sm text-slate-400">
-          We auto-apply this profile in the Scenario Studio, Kit Builder, and gut training guides so plans stay personal.
-        </p>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        <dl className="space-y-4">
-          <div className="space-y-2">
-            <dt className="text-xs uppercase tracking-wide text-slate-400">Diet focus</dt>
-            {renderChipRow(dietChips)}
-            <p className="text-xs text-slate-400">Flavor notes: {flavorChips.join(" / ")}</p>
-          </div>
-
-          <div className="space-y-2">
-            <dt className="text-xs uppercase tracking-wide text-slate-400">Brand stance</dt>
-            {renderChipRow(brandChips)}
-            <p className="text-xs text-slate-400">{bannedChips.join(", ")}</p>
-          </div>
-        </dl>
-
-        <dl className="space-y-4">
-          <div className="space-y-2">
-            <dt className="text-xs uppercase tracking-wide text-slate-400">Fueling style</dt>
-            <ul className="space-y-1 text-sm text-slate-100">
-              {fuelHighlights.map((highlight) => (
-                <li key={highlight}>{highlight}</li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="space-y-2">
-            <dt className="text-xs uppercase tracking-wide text-slate-400">Caffeine & carry</dt>
-            <p className="text-sm text-slate-100">{caffeineCopy[summary.caffeine]}</p>
-            {renderChipRow(carryChips)}
-          </div>
-        </dl>
-      </div>
-
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800 pt-4">
-        <p className="text-xs text-slate-400">
-          Keep this section up to date to get better scenario recommendations and kit picks.
-        </p>
+      <div className="mb-4 flex items-start justify-between gap-4">
+        <div>
+          <h2 id="preference-summary-title" className="text-base font-bold text-gray-900">
+            Your Fueling Profile
+          </h2>
+          <p className="text-xs text-gray-600 mt-0.5">
+            Auto-applied to all plans
+          </p>
+        </div>
         <a
           href="#preferences"
-          className="inline-flex items-center justify-center rounded-full border border-cyan-500 px-4 py-2 text-xs font-semibold text-cyan-200 transition-colors hover:border-cyan-400 hover:text-cyan-100"
+          className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition-all hover:border-cyan-500 hover:text-cyan-600"
         >
-          Update preferences
+          Edit
         </a>
+      </div>
+
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <dt className="text-xs font-semibold text-gray-700">Diet & Brands</dt>
+          {renderChipRow([...dietChips.slice(0, 3), ...brandChips.slice(0, 2)])}
+        </div>
+
+        <div className="space-y-2">
+          <dt className="text-xs font-semibold text-gray-700">Fueling Style</dt>
+          <p className="text-sm text-gray-700">{fuelHighlights[0]}</p>
+        </div>
+
+        <div className="space-y-2">
+          <dt className="text-xs font-semibold text-gray-700">Caffeine & Carry</dt>
+          <p className="text-sm text-gray-700">{caffeineCopy[summary.caffeine].split(' - ')[0]}</p>
+          <div className="flex flex-wrap gap-1.5">
+            {carryChips.slice(0, 3).map((chip) => (
+              <span key={chip} className="text-xs text-gray-600">• {chip}</span>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );

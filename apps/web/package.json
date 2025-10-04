@@ -14,6 +14,7 @@
   "dependencies": {
     "dotenv": "^16.4.5",
     "googleapis": "^140.0.0",
+    "gpxparser": "^3.0.8",
     "next": "15.5.4",
     "next-auth": "^4.24.11",
     "react": "19.1.0",

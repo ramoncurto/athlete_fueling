@@ -40,38 +40,15 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
 
   return (
     <AuthProvider>
-      <div className="min-h-screen bg-slate-950 text-slate-100">
-        <header className="border-b border-slate-800 bg-slate-950/80 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
-            <Link href={`/${locale}`} className="font-semibold tracking-tight">
-              Athletic Fuel
-            </Link>
-            <nav className="flex items-center gap-6 text-sm uppercase tracking-wide text-slate-300">
-              {navigation.map((item) => (
-                <Link key={item.href} href={`/${locale}${item.href}`} className="hover:text-white">
-                  {item.label}
-                </Link>
-              ))}
-              <Link
-                href={`/${locale}/checkout/annual`}
-                className="rounded-full bg-gradient-to-r from-cyan-500 to-sky-600 px-4 py-2 text-xs font-semibold text-white shadow-lg shadow-cyan-500/30"
-              >
-                Subscribe $20/year
-              </Link>
-            </nav>
-          </div>
-        </header>
-        <main className="mx-auto max-w-6xl px-6 pb-16 pt-10">{children}</main>
-        <footer className="border-t border-slate-800 bg-slate-950/60">
-          <div className="mx-auto flex max-w-6xl flex-col gap-4 px-6 py-8 text-sm text-slate-400 md:flex-row md:items-center md:justify-between">
-            <p>&copy; {new Date().getFullYear()} Athletic Fuel. All rights reserved.</p>
-            <div className="flex gap-4">
-              <Link href={`/${locale}/legal/terms`}>Terms</Link>
-              <Link href={`/${locale}/legal/privacy`}>Privacy</Link>
-              <Link href={`/${locale}/legal/disclaimer`}>Disclaimer</Link>
-            </div>
-          </div>
-        </footer>
+      <div className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-100">
+        {/* Subtle gradient background */}
+        <div className="pointer-events-none fixed inset-0 z-0">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-900/10 via-slate-950 to-slate-950"></div>
+          <div className="absolute left-1/2 top-0 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-cyan-500/5 blur-3xl"></div>
+          <div className="absolute bottom-0 right-0 h-[300px] w-[300px] rounded-full bg-blue-500/5 blur-3xl"></div>
+        </div>
+
+        <main className="relative z-10">{children}</main>
       </div>
     </AuthProvider>
   );

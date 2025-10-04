@@ -38,6 +38,12 @@ export const AidStationSchema = z.object({
 });
 export type AidStation = z.infer<typeof AidStationSchema>;
 
+export const ElevationPointSchema = z.object({
+  distanceKm: z.number().nonnegative(),
+  elevationM: z.number(),
+});
+export type ElevationPoint = z.infer<typeof ElevationPointSchema>;
+
 export const RouteSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -46,6 +52,8 @@ export const RouteSchema = z.object({
   elevationGainM: z.number().nonnegative(),
   laps: z.number().int().positive().default(1),
   aidStations: z.array(AidStationSchema),
+  elevationProfile: z.array(ElevationPointSchema).optional(),
+  gpxFileUrl: z.string().optional(),
   notes: z.string().optional(),
 });
 export type Route = z.infer<typeof RouteSchema>;
@@ -104,6 +112,19 @@ export const PreferenceSchema = z.object({
 });
 export type Preference = z.infer<typeof PreferenceSchema>;
 
+export const RaceResultSchema = z.object({
+  eventId: z.string(),
+  finishTimeMinutes: z.number().positive(),
+  perceivedEffort: z.enum(["easy", "moderate", "hard", "maximal"]),
+  conditions: z.object({
+    temperatureC: z.number().optional(),
+    weather: z.string().optional(),
+  }).optional(),
+  date: z.string(),
+  notes: z.string().optional(),
+});
+export type RaceResult = z.infer<typeof RaceResultSchema>;
+
 export const AthleteSchema = z.object({
   id: z.string(),
   email: z.string().email(),
@@ -111,8 +132,29 @@ export const AthleteSchema = z.object({
   lastName: z.string(),
   weightKg: z.number().positive(),
   heightCm: z.number().positive().optional(),
+
+  // Performance metrics
   ftpWatts: z.number().optional(),
+  vo2max: z.number().optional(),
+
+  // Pace zones (all in min/km)
   longRunPaceMinKm: z.number().optional(),
+  thresholdPaceMinKm: z.number().optional(),
+  marathonPaceMinKm: z.number().optional(),
+  recoveryPaceMinKm: z.number().optional(),
+
+  // Terrain abilities
+  climbingStrength: z.enum(["weak", "average", "strong"]).default("average"),
+  descendingSkill: z.enum(["cautious", "average", "aggressive"]).default("average"),
+  technicalTerrainAbility: z.enum(["beginner", "intermediate", "advanced"]).default("intermediate"),
+
+  // Experience
+  experienceLevel: z.enum(["novice", "intermediate", "advanced", "elite"]).default("intermediate"),
+  yearsOfTraining: z.number().nonnegative().optional(),
+
+  // Race history for time estimation calibration
+  raceHistory: z.array(RaceResultSchema).default([]),
+
   timezone: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),

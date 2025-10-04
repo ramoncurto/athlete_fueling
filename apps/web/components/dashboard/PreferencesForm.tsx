@@ -20,6 +20,19 @@ const sodiumOptions: Preference['sodiumSensitivity'][] = ['low', 'medium', 'high
 const dietaryFlags: Preference['dietaryFlags'][number][] = ['vegan', 'vegetarian', 'gluten_free', 'dairy_free', 'nut_allergy', 'soy_allergy'];
 const eventTemplates = ['road_cool', 'road_hot', 'trail_hot', 'trail_cool', 'custom'] as const;
 
+const commonHomemadeSupplements = [
+  'Rice cakes',
+  'Potato balls',
+  'Energy balls',
+  'Banana bread',
+  'Homemade gels',
+  'Date bars',
+  'Sweet potato mash',
+  'Peanut butter sandwiches',
+  'DIY drink mix',
+  'Maple syrup packets',
+];
+
 type PreferencesFormProps = {
   preference: Preference;
 };
@@ -28,11 +41,11 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
   const [prefs, setPrefs] = useState(preference);
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['basics']));
+  const [customHomemade, setCustomHomemade] = useState('');
   const favoriteBrandsText = useMemo(() => prefs.favoriteBrands.join(', '), [prefs.favoriteBrands]);
   const bannedBrandsText = useMemo(() => prefs.bannedBrands.join(', '), [prefs.bannedBrands]);
   const preferredProductsText = useMemo(() => prefs.preferredProducts.join('\n'), [prefs.preferredProducts]);
   const textureNotesText = useMemo(() => prefs.tasteProfile.textureNotes.join(', '), [prefs.tasteProfile.textureNotes]);
-  const homemadeText = useMemo(() => (prefs.homemadeSupplements ?? []).join('\n'), [prefs.homemadeSupplements]);
 
   type PreferencePatchValue =
   | Preference[keyof Preference]
@@ -91,6 +104,28 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
     });
   };
 
+  const toggleHomemadeSupplement = (supplement: string) => {
+    const current = prefs.homemadeSupplements ?? [];
+    const next = current.includes(supplement)
+      ? current.filter(s => s !== supplement)
+      : [...current, supplement];
+    updatePreference('homemadeSupplements', next);
+  };
+
+  const addCustomHomemade = () => {
+    if (!customHomemade.trim()) return;
+    const current = prefs.homemadeSupplements ?? [];
+    if (!current.includes(customHomemade.trim())) {
+      updatePreference('homemadeSupplements', [...current, customHomemade.trim()]);
+    }
+    setCustomHomemade('');
+  };
+
+  const removeHomemadeSupplement = (supplement: string) => {
+    const current = prefs.homemadeSupplements ?? [];
+    updatePreference('homemadeSupplements', current.filter(s => s !== supplement));
+  };
+
   const CollapsibleSection = ({
     id,
     title,
@@ -105,26 +140,26 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
     const isExpanded = expandedSections.has(id);
 
     return (
-      <div className="rounded-2xl border border-slate-800/50 bg-slate-800/20">
+      <div className="rounded-xl border border-gray-200 bg-white shadow-sm overflow-hidden">
         <button
           type="button"
           onClick={() => toggleSection(id)}
-          className="flex w-full items-center justify-between p-4 text-left hover:bg-slate-800/30 transition-colors"
+          className="flex w-full items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors"
         >
           <div>
-            <h4 className="text-sm font-semibold text-white">{title}</h4>
+            <h4 className="text-base font-bold text-gray-900">{title}</h4>
             {description && (
-              <p className="text-xs text-slate-400 mt-1">{description}</p>
+              <p className="text-sm text-gray-600 mt-0.5">{description}</p>
             )}
           </div>
           {isExpanded ? (
-            <ChevronDownIcon className="h-4 w-4 text-slate-400" />
+            <ChevronDownIcon className="h-5 w-5 text-gray-400 flex-shrink-0" />
           ) : (
-            <ChevronRightIcon className="h-4 w-4 text-slate-400" />
+            <ChevronRightIcon className="h-5 w-5 text-gray-400 flex-shrink-0" />
           )}
         </button>
         {isExpanded && (
-          <div className="p-4 pt-0 space-y-4">
+          <div className="px-5 pb-5 pt-1 space-y-5 bg-gradient-to-b from-gray-50/50 to-white">
             {children}
           </div>
         )}
@@ -133,40 +168,40 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
   };
 
   return (
-    <div className="rounded-3xl border border-slate-800/70 bg-slate-900/40 p-6" id="preferences">
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-4" id="preferences">
+      <div className="flex items-start justify-between mb-2">
         <div className="flex items-center gap-3">
-          <div className="rounded-full bg-purple-500/20 p-2">
-            <svg className="h-5 w-5 text-purple-400" fill="currentColor" viewBox="0 0 20 20">
+          <div className="rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 p-2.5">
+            <svg className="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clipRule="evenodd" />
             </svg>
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white">Preferences</h3>
-            <p className="text-sm text-slate-400">Customize your fueling recommendations</p>
+            <h3 className="text-xl font-bold text-gray-900">Preferences</h3>
+            <p className="text-sm text-gray-600">Customize your fueling recommendations</p>
           </div>
         </div>
         <div className="text-right">
           {status === 'saving' && (
-            <div className="flex items-center gap-2 text-slate-400">
-              <div className="h-3 w-3 animate-spin rounded-full border-2 border-slate-500 border-t-cyan-400"></div>
-              <span className="text-xs">Saving...</span>
+            <div className="flex items-center gap-2 text-gray-600">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-purple-600"></div>
+              <span className="text-sm font-medium">Saving...</span>
             </div>
           )}
           {status === 'saved' && (
-            <div className="flex items-center gap-2 text-cyan-300">
-              <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+            <div className="flex items-center gap-2 text-green-600">
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
-              <span className="text-xs font-medium">Saved!</span>
+              <span className="text-sm font-semibold">Saved!</span>
             </div>
           )}
           {status === 'error' && (
-            <div className="flex items-center gap-2 text-red-300">
-              <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+            <div className="flex items-center gap-2 text-red-600">
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
-              <span className="text-xs font-medium">Error</span>
+              <span className="text-sm font-semibold">Error</span>
             </div>
           )}
         </div>
@@ -179,17 +214,17 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
           description="Core preferences that affect all recommendations"
         >
           <div>
-            <label className="text-xs uppercase tracking-wide text-slate-500">Caffeine sensitivity</label>
-            <div className="mt-2 flex gap-2">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Caffeine sensitivity</label>
+            <div className="flex gap-2">
               {caffeineOptions.map((option) => (
                 <button
                   key={option}
                   type="button"
                   onClick={() => updatePreference('caffeineSensitivity', option)}
-                  className={`rounded-full px-4 py-2 text-xs uppercase tracking-wide ${
+                  className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold uppercase tracking-wide transition-all ${
                     prefs.caffeineSensitivity === option
-                      ? 'bg-gradient-to-r from-cyan-500 to-sky-600 text-white'
-                      : 'border border-slate-700 text-slate-300'
+                      ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   {option}
@@ -198,17 +233,17 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
             </div>
           </div>
           <div>
-            <label className="text-xs uppercase tracking-wide text-slate-500">Sodium sensitivity</label>
-            <div className="mt-2 flex gap-2">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Sodium sensitivity</label>
+            <div className="flex gap-2">
               {sodiumOptions.map((option) => (
                 <button
                   key={option}
                   type="button"
                   onClick={() => updatePreference('sodiumSensitivity', option)}
-                  className={`rounded-full px-4 py-2 text-xs uppercase tracking-wide ${
+                  className={`flex-1 rounded-lg px-4 py-2.5 text-sm font-semibold uppercase tracking-wide transition-all ${
                     prefs.sodiumSensitivity === option
-                      ? 'bg-gradient-to-r from-cyan-500 to-sky-600 text-white'
-                      : 'border border-slate-700 text-slate-300'
+                      ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   {option}
@@ -217,15 +252,15 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
             </div>
           </div>
           <div>
-            <label className="text-xs uppercase tracking-wide text-slate-500">Supplementation style</label>
-            <div className="mt-2 grid grid-cols-2 gap-3">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Supplementation style</label>
+            <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
                 onClick={() => updatePreference('prefersEnergyDrink', !prefs.prefersEnergyDrink)}
-                className={`rounded-full px-4 py-2 text-xs uppercase tracking-wide ${
+                className={`rounded-lg px-4 py-3 text-sm font-semibold uppercase tracking-wide transition-all ${
                   prefs.prefersEnergyDrink
-                    ? 'bg-gradient-to-r from-cyan-500 to-sky-600 text-white'
-                    : 'border border-slate-700 text-slate-300'
+                    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 {prefs.prefersEnergyDrink ? 'Energy drinks: yes' : 'Energy drinks: no'}
@@ -233,20 +268,20 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
               <button
                 type="button"
                 onClick={() => updatePreference('usesGels', !prefs.usesGels)}
-                className={`rounded-full px-4 py-2 text-xs uppercase tracking-wide ${
+                className={`rounded-lg px-4 py-3 text-sm font-semibold uppercase tracking-wide transition-all ${
                   prefs.usesGels
-                    ? 'bg-gradient-to-r from-cyan-500 to-sky-600 text-white'
-                    : 'border border-slate-700 text-slate-300'
+                    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 {prefs.usesGels ? 'Gels: yes' : 'Gels: no'}
               </button>
             </div>
-            <p className="mt-2 text-[11px] text-slate-500">These settings help bias product recommendations.</p>
+            <p className="mt-2.5 text-xs text-gray-600">These settings help bias product recommendations.</p>
           </div>
           <div>
-            <label className="text-xs uppercase tracking-wide text-slate-500">Dietary restrictions</label>
-            <div className="mt-2 flex flex-wrap gap-2">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Dietary restrictions</label>
+            <div className="flex flex-wrap gap-2">
               {dietaryFlags.map((flag) => {
                 const checked = prefs.dietaryFlags.includes(flag);
                 return (
@@ -259,10 +294,10 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
                         : [...prefs.dietaryFlags, flag];
                       updatePreference('dietaryFlags', next);
                     }}
-                    className={`rounded-full px-3 py-2 text-xs uppercase tracking-wide ${
+                    className={`rounded-lg px-3.5 py-2 text-xs font-medium uppercase tracking-wide transition-all ${
                       checked
-                        ? 'bg-gradient-to-r from-cyan-500 to-sky-600 text-white'
-                        : 'border border-slate-700 text-slate-300'
+                        ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
                     {flag.replace('_', ' ')}
@@ -279,7 +314,7 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
           description="Favorite and banned brands for kit building"
         >
           <div>
-            <label className="text-xs uppercase tracking-wide text-slate-500">Favorite brands</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Favorite brands</label>
             <input
               type="text"
               value={favoriteBrandsText}
@@ -292,11 +327,11 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
                     .map((brand) => brand.trim())
                     .filter(Boolean),
                 )}
-              className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/70 px-4 py-3 text-xs text-white focus:border-cyan-500 focus:outline-none"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-500 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none transition-all"
             />
           </div>
           <div>
-            <label className="text-xs uppercase tracking-wide text-slate-500">Banned brands</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Banned brands</label>
             <input
               type="text"
               value={bannedBrandsText}
@@ -309,11 +344,11 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
                     .map((brand) => brand.trim())
                     .filter(Boolean),
                 )}
-              className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/70 px-4 py-3 text-xs text-white focus:border-cyan-500 focus:outline-none"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-500 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none transition-all"
             />
           </div>
           <div>
-            <label className="text-xs uppercase tracking-wide text-slate-500">Preferred products</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Preferred products</label>
             <textarea
               rows={3}
               value={preferredProductsText}
@@ -327,7 +362,7 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
                 )
               }
               placeholder="e.g. Maurten Gel 100&#10;Skratch Hydration Mix"
-              className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/70 px-4 py-3 text-xs text-white focus:border-cyan-500 focus:outline-none"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-500 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none transition-all resize-none"
             />
           </div>
         </CollapsibleSection>
@@ -338,8 +373,8 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
           description="Flavor preferences and texture notes"
         >
           <div>
-            <label className="text-xs uppercase tracking-wide text-slate-500">Flavor preferences</label>
-            <div className="mt-2 flex flex-wrap gap-2">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Flavor preferences</label>
+            <div className="flex flex-wrap gap-2">
               {[
                 { key: 'prefersSweet', label: 'Sweet' },
                 { key: 'prefersSalty', label: 'Salty' },
@@ -353,10 +388,10 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
                       [key]: !prefs.tasteProfile[key as keyof typeof prefs.tasteProfile],
                     })
                   }
-                  className={`rounded-full px-3 py-2 text-xs uppercase tracking-wide ${
+                  className={`rounded-lg px-4 py-2 text-sm font-semibold uppercase tracking-wide transition-all ${
                     prefs.tasteProfile[key as keyof typeof prefs.tasteProfile]
-                      ? 'bg-gradient-to-r from-cyan-500 to-sky-600 text-white'
-                      : 'border border-slate-700 text-slate-300'
+                      ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   {label}
@@ -365,7 +400,7 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
             </div>
           </div>
           <div>
-            <label className="text-xs uppercase tracking-wide text-slate-500">Texture notes</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Texture notes</label>
             <input
               type="text"
               value={textureNotesText}
@@ -381,25 +416,25 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
                   },
                 )
               }
-              className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/70 px-4 py-3 text-xs text-white focus:border-cyan-500 focus:outline-none"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-500 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none transition-all"
             />
           </div>
           <div>
-            <label className="text-xs uppercase tracking-wide text-slate-500">Target flavor variety</label>
-            <div className="mt-2 flex items-center gap-3">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Target flavor variety</label>
+            <div className="flex items-center gap-4">
               <input
                 type="range"
                 min={1}
                 max={5}
                 value={prefs.targetFlavorDiversity}
                 onChange={(event) => updatePreference('targetFlavorDiversity', Number(event.target.value))}
-                className="flex-1"
+                className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-cyan-600"
               />
-              <span className="text-sm font-medium text-white min-w-0">
+              <span className="text-base font-bold text-gray-900 min-w-[4rem] text-center">
                 {prefs.targetFlavorDiversity} flavor{prefs.targetFlavorDiversity !== 1 ? 's' : ''}
               </span>
             </div>
-            <p className="mt-1 text-[11px] text-slate-500">How many different flavors to include in kits</p>
+            <p className="mt-2 text-xs text-gray-600">How many different flavors to include in kits</p>
           </div>
         </CollapsibleSection>
 
@@ -410,44 +445,44 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
         >
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <span className="block text-xs uppercase tracking-wide text-slate-500">Bottles</span>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Bottles</label>
               <input
                 type="number"
                 min={0}
                 value={prefs.carryProfile.bottles}
                 onChange={(e) => updatePreference('carryProfile', { bottles: Number(e.target.value || 0) })}
-                className="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-white focus:border-cyan-500 focus:outline-none"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none transition-all"
               />
             </div>
             <div>
-              <span className="block text-xs uppercase tracking-wide text-slate-500">Soft flasks</span>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Soft flasks</label>
               <input
                 type="number"
                 min={0}
                 value={prefs.carryProfile.softFlasks}
                 onChange={(e) => updatePreference('carryProfile', { softFlasks: Number(e.target.value || 0) })}
-                className="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-white focus:border-cyan-500 focus:outline-none"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none transition-all"
               />
             </div>
             <div>
-              <span className="block text-xs uppercase tracking-wide text-slate-500">Gel loops</span>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Gel loops</label>
               <input
                 type="number"
                 min={0}
                 value={prefs.carryProfile.gelLoops}
                 onChange={(e) => updatePreference('carryProfile', { gelLoops: Number(e.target.value || 0) })}
-                className="mt-1 w-full rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs text-white focus:border-cyan-500 focus:outline-none"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none transition-all"
               />
             </div>
             <div>
-              <span className="block text-xs uppercase tracking-wide text-slate-500">Uses vest</span>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Uses vest</label>
               <button
                 type="button"
                 onClick={() => updatePreference('carryProfile', { prefersVest: !prefs.carryProfile.prefersVest })}
-                className={`mt-1 w-full rounded-full px-4 py-2 text-xs uppercase tracking-wide ${
+                className={`w-full rounded-lg px-4 py-2.5 text-sm font-semibold uppercase tracking-wide transition-all ${
                   prefs.carryProfile.prefersVest
-                    ? 'bg-gradient-to-r from-cyan-500 to-sky-600 text-white'
-                    : 'border border-slate-700 text-slate-300'
+                    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
                 {prefs.carryProfile.prefersVest ? 'Yes' : 'No'}
@@ -457,16 +492,102 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
         </CollapsibleSection>
 
         <CollapsibleSection
-          id="advanced"
-          title="Advanced Settings"
-          description="Event templates and homemade supplements"
+          id="homemade"
+          title="Homemade Supplements"
+          description="Custom nutrition you make yourself"
         >
           <div>
-            <label className="text-xs uppercase tracking-wide text-slate-500">Default event template</label>
+            {/* Common options */}
+            <div className="mb-4">
+              <p className="text-xs text-gray-600 mb-2">Select common options:</p>
+              <div className="flex flex-wrap gap-2">
+                {commonHomemadeSupplements.map((supplement) => {
+                  const isSelected = (prefs.homemadeSupplements ?? []).includes(supplement);
+                  return (
+                    <button
+                      key={supplement}
+                      type="button"
+                      onClick={() => toggleHomemadeSupplement(supplement)}
+                      className={`rounded-lg px-3.5 py-2 text-xs font-medium transition-all ${
+                        isSelected
+                          ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-md'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {supplement}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Custom input */}
+            <div>
+              <p className="text-xs text-gray-600 mb-2">Add custom supplement:</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={customHomemade}
+                  onChange={(e) => setCustomHomemade(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      addCustomHomemade();
+                    }
+                  }}
+                  placeholder="e.g. Homemade energy bars"
+                  className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-500 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={addCustomHomemade}
+                  className="rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md hover:shadow-lg transition-all"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+
+            {/* Selected items */}
+            {(prefs.homemadeSupplements ?? []).length > 0 && (
+              <div className="mt-4">
+                <p className="text-xs text-gray-600 mb-2">Selected supplements:</p>
+                <div className="flex flex-wrap gap-2">
+                  {(prefs.homemadeSupplements ?? []).map((supplement) => (
+                    <div
+                      key={supplement}
+                      className="inline-flex items-center gap-2 rounded-lg bg-cyan-50 border border-cyan-200 px-3 py-1.5 text-sm text-cyan-900"
+                    >
+                      <span className="font-medium">{supplement}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeHomemadeSupplement(supplement)}
+                        className="text-cyan-700 hover:text-cyan-900 transition-colors"
+                        aria-label={`Remove ${supplement}`}
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </CollapsibleSection>
+
+        <CollapsibleSection
+          id="advanced"
+          title="Advanced Settings"
+          description="Event templates and other settings"
+        >
+          <div>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 mb-2">Default event template</label>
             <select
               value={prefs.defaultEventTemplate}
               onChange={(e) => updatePreference('defaultEventTemplate', e.target.value)}
-              className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/70 px-4 py-3 text-xs text-white focus:border-cyan-500 focus:outline-none"
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 focus:outline-none transition-all"
             >
               {eventTemplates.map((tpl) => (
                 <option key={tpl} value={tpl}>
@@ -474,24 +595,6 @@ export default function PreferencesForm({ preference }: PreferencesFormProps) {
                 </option>
               ))}
             </select>
-          </div>
-          <div>
-            <label className="text-xs uppercase tracking-wide text-slate-500">Homemade supplements</label>
-            <textarea
-              rows={3}
-              value={homemadeText}
-              onChange={(event) =>
-                updatePreference(
-                  'homemadeSupplements',
-                  event.target.value
-                    .split(/\n|,/)
-                    .map((s) => s.trim())
-                    .filter(Boolean),
-                )
-              }
-              placeholder={"e.g. rice cakes&#10;DIY drink mix (maltodextrin + sodium)"}
-              className="mt-2 w-full rounded-xl border border-slate-700 bg-slate-950/70 px-4 py-3 text-xs text-white focus:border-cyan-500 focus:outline-none"
-            />
           </div>
         </CollapsibleSection>
       </div>
